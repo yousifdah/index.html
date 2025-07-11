@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mijn Budgetplanner</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
 </head>
 <body>
   <header>
@@ -17,25 +17,34 @@
   </header>
 
   <section class="form-section">
+    <label for="month-select">Selecteer maand:</label>
+    <select id="month-select">
+      <option value="2025-07">Juli 2025</option>
+      <option value="2025-08">Augustus 2025</option>
+      <option value="2025-09">September 2025</option>
+    </select>
+  </section>
+
+  <section class="form-section">
     <h2>Inkomsten toevoegen</h2>
-    <input type="text" id="income-source" placeholder="Bron">
-    <input type="number" id="income-amount" placeholder="Bedrag (€)">
-    <button onclick="addIncome()">Toevoegen</button>
+    <input type="text" id="income-source" placeholder="Bron" />
+    <input type="number" id="income-amount" placeholder="Bedrag (€)" />
+    <button id="income-btn">Toevoegen</button>
   </section>
 
   <section class="form-section">
     <h2>Uitgaven toevoegen</h2>
-    <input type="text" id="expense-category" placeholder="Categorie">
-    <input type="number" id="expense-amount" placeholder="Bedrag (€)">
-    <button onclick="addExpense()">Toevoegen</button>
+    <input type="text" id="expense-category" placeholder="Categorie" />
+    <input type="number" id="expense-amount" placeholder="Bedrag (€)" />
+    <button id="expense-btn">Toevoegen</button>
   </section>
 
   <section class="form-section">
     <h2>Spaardoel toevoegen</h2>
-    <input type="text" id="saving-goal" placeholder="Doel">
-    <input type="number" id="saving-target" placeholder="Doelbedrag (€)">
-    <input type="number" id="saving-progress" placeholder="Gespaard (€)">
-    <button onclick="addSaving()">Toevoegen</button>
+    <input type="text" id="saving-goal" placeholder="Doel" />
+    <input type="number" id="saving-target" placeholder="Doelbedrag (€)" />
+    <input type="number" id="saving-progress" placeholder="Gespaard (€)" />
+    <button id="saving-btn">Toevoegen</button>
   </section>
 
   <section>
@@ -63,6 +72,7 @@
     <h2>Overzicht</h2>
     <p id="total-balance">Totaal saldo: €0</p>
     <canvas id="budget-chart"></canvas>
+    <button id="export-btn">Download als CSV</button>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
