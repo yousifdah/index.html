@@ -1,0 +1,77 @@
+:root {
+  --bg-color-light: #f4f4f4;
+  --text-color-light: #222;
+  --header-color-light: #2a9d8f;
+
+  --bg-color-dark: #1e1e1e;
+  --text-color-dark: #e0e0e0;
+  --header-color-dark: #00c896;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg-color-light);
+  color: var(--text-color-light);
+  padding: 20px;
+  transition: background 0.4s, color 0.4s;
+}
+
+.dark-mode {
+  background-color: var(--bg-color-dark);
+  color: var(--text-color-dark);
+}
+
+h1 {
+  color: var(--header-color-light);
+  margin-bottom: 10px;
+}
+
+.dark-mode h1 {
+  color: var(--header-color-dark);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+button {
+  padding: 8px 16px;
+  background-color: #2a9d8f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #21867a;
+}
+
+section {
+  margin-bottom: 40px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #e9ecef;
+}
+
+canvas {
+  max-width: 600px;
+  width: 100%;
+  margin-top: 20px;
+}
