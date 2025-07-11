@@ -11,8 +11,8 @@
   <header>
     <h1 id="page-title">Mijn Budgetplanner</h1>
     <div class="controls">
-      <button id="theme-toggle" aria-label="Thema wisselen">🌙 Thema</button>
-      <button id="language-toggle" aria-label="Taal wisselen">🇬🇧 Engels</button>
+      <button id="theme-toggle">🌙 Thema</button>
+      <button id="language-toggle">🇬🇧 Engels</button>
     </div>
   </header>
 
@@ -25,14 +25,14 @@
     <h2>Inkomsten toevoegen</h2>
     <input type="text" id="income-source" placeholder="Bron" />
     <input type="number" id="income-amount" placeholder="Bedrag (€)" />
-    <button id="income-btn" aria-label="Inkomen toevoegen">Toevoegen</button>
+    <button id="income-btn">Toevoegen</button>
   </section>
 
   <section class="form-section">
     <h2>Uitgaven toevoegen</h2>
     <input type="text" id="expense-category" placeholder="Categorie" />
     <input type="number" id="expense-amount" placeholder="Bedrag (€)" />
-    <button id="expense-btn" aria-label="Uitgave toevoegen">Toevoegen</button>
+    <button id="expense-btn">Toevoegen</button>
   </section>
 
   <section class="form-section">
@@ -40,15 +40,13 @@
     <input type="text" id="saving-goal" placeholder="Doel" />
     <input type="number" id="saving-target" placeholder="Doelbedrag (€)" />
     <input type="number" id="saving-progress" placeholder="Gespaard (€)" />
-    <button id="saving-btn" aria-label="Spaardoel toevoegen">Toevoegen</button>
+    <button id="saving-btn">Toevoegen</button>
   </section>
 
   <section>
     <h2>Inkomsten</h2>
     <table id="income-table">
-      <thead>
-        <tr><th>Bron</th><th>Bedrag (€)</th><th></th></tr>
-      </thead>
+      <thead><tr><th>Bron</th><th>Bedrag (€)</th><th></th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -56,9 +54,7 @@
   <section>
     <h2>Uitgaven</h2>
     <table id="expense-table">
-      <thead>
-        <tr><th>Categorie</th><th>Bedrag (€)</th><th></th></tr>
-      </thead>
+      <thead><tr><th>Categorie</th><th>Bedrag (€)</th><th></th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -66,9 +62,7 @@
   <section>
     <h2>Spaardoelen</h2>
     <table id="savings-table">
-      <thead>
-        <tr><th>Doel</th><th>Doelbedrag</th><th>Gespaard</th><th>Voortgang</th><th></th></tr>
-      </thead>
+      <thead><tr><th>Doel</th><th>Doelbedrag</th><th>Gespaard</th><th>Voortgang</th><th></th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -77,7 +71,7 @@
     <h2>Overzicht</h2>
     <p id="total-balance">Totaal saldo: €0</p>
     <canvas id="budget-chart" width="400" height="200"></canvas>
-    <button id="export-btn" aria-label="Download als CSV">Download als CSV</button>
+    <button id="export-btn">Download als CSV</button>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
