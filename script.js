@@ -189,4 +189,3 @@ function getBalance() {
 
 function updateChart() {
   const ctx = document.getElementById("budget-chart").getContext("2d");
-  const data = [incomes.reduce((s
