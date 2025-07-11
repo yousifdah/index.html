@@ -217,3 +217,33 @@ function updateChart() {
     chart.update();
   }
 }
+function updateAll() {
+  updateIncomeTable();
+  updateExpenseTable();
+  updateSavingsTable();
+  updateChart();
+  document.getElementById("total-balance").textContent =
+    `${translations[currentLang].balance}: €${getBalance().toFixed(2)}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark-mode");
+  }
+
+  generateMonthOptions();
+  loadMonthData();
+  updateAll();
+
+  document.getElementById("income-btn").addEventListener("click", addIncome);
+  document.getElementById("expense-btn").addEventListener("click", addExpense);
+  document.getElementById("saving-btn").addEventListener("click", addSaving);
+  document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+  document.getElementById("language-toggle").addEventListener("click", toggleLanguage);
+  document.getElementById("export-btn").addEventListener("click", exportCSV);
+  document.getElementById("month-select").addEventListener("change", () => {
+    loadMonthData();
+    updateAll();
+  });
+});
+
