@@ -1,9 +1,14 @@
-// 🧾 Globale data
 let incomes = [], expenses = [], savings = [];
 let currentLang = "nl";
 let chart;
 
-// 🌍 Taal vertalingen
+// 🌙 Thema wissel
+function toggleTheme() {
+  document.body.classList.toggle("dark-mode");
+  localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+}
+
+// 🌍 Taal wissel
 const translations = {
   nl: {
     title: "Mijn Budgetplanner",
@@ -21,13 +26,6 @@ const translations = {
   }
 };
 
-// 🌙 Thema wisselen
-function toggleTheme() {
-  document.body.classList.toggle("dark-mode");
-  localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
-}
-
-// 🈶 Taal wisselen
 function toggleLanguage() {
   currentLang = currentLang === "nl" ? "en" : "nl";
   const t = translations[currentLang];
@@ -42,19 +40,17 @@ function toggleLanguage() {
 }
 
 // 📆 Maandbeheer
-function handleMonthChange() {
-  loadMonthData(document.getElementById("month-select").value);
-  updateAll();
+function getMonthKey() {
+  return "budget_" + document.getElementById("month-select").value;
 }
 
 function saveMonthData() {
   const data = { incomes, expenses, savings };
-  const key = "budget_" + document.getElementById("month-select").value;
-  localStorage.setItem(key, JSON.stringify(data));
+  localStorage.setItem(getMonthKey(), JSON.stringify(data));
 }
 
-function loadMonthData(month) {
-  const raw = localStorage.getItem("budget_" + month);
+function loadMonthData() {
+  const raw = localStorage.getItem(getMonthKey());
   if (raw) {
     const data = JSON.parse(raw);
     incomes = data.incomes || [];
@@ -67,7 +63,7 @@ function loadMonthData(month) {
   }
 }
 
-// ➕ Invoerfuncties
+// ➕ Toevoegen functies
 function addIncome() {
   const source = document.getElementById("income-source").value;
   const amount = parseFloat(document.getElementById("income-amount").value);
@@ -96,21 +92,12 @@ function addSaving() {
   updateAll();
 }
 
-// 🔄 Updatefunctie
-function updateAll() {
-  updateIncomeTable();
-  updateExpenseTable();
-  updateSavingsTable();
-  updateChart();
-  document.getElementById("total-balance").textContent = `${translations[currentLang].balance}: €${getBalance()}`;
-}
-
 // 📋 Tabellen
 function updateIncomeTable() {
   const table = document.getElementById("income-table");
   table.innerHTML = "<tr><th>Bron</th><th>Bedrag (€)</th></tr>";
   incomes.forEach(i => {
-    table.innerHTML += `<tr><td>${i.source}</td><td>${i.amount}</td></tr>`;
+    table.innerHTML += `<tr><td>${i.source}</td><td>${i.amount.toFixed(2)}</td></tr>`;
   });
 }
 
@@ -118,7 +105,7 @@ function updateExpenseTable() {
   const table = document.getElementById("expense-table");
   table.innerHTML = "<tr><th>Categorie</th><th>Bedrag (€)</th></tr>";
   expenses.forEach(e => {
-    table.innerHTML += `<tr><td>${e.category}</td><td>${e.amount}</td></tr>`;
+    table.innerHTML += `<tr><td>${e.category}</td><td>${e.amount.toFixed(2)}</td></tr>`;
   });
 }
 
@@ -129,14 +116,14 @@ function updateSavingsTable() {
     const percent = Math.min((s.progress / s.target) * 100, 100);
     table.innerHTML += `<tr>
       <td>${s.goal}</td>
-      <td>€${s.target}</td>
-      <td>€${s.progress}</td>
+      <td>€${s.target.toFixed(2)}</td>
+      <td>€${s.progress.toFixed(2)}</td>
       <td><progress value="${percent}" max="100"></progress></td>
     </tr>`;
   });
 }
 
-// 💵 Saldo
+// 💰 Saldo
 function getBalance() {
   const incomeTotal = incomes.reduce((sum, i) => sum + i.amount, 0);
   const expenseTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
@@ -190,25 +177,33 @@ function exportCSV() {
   link.click();
 }
 
-// 🚀 Initialisatie bij laden
+// 🔄 Alles updaten
+function updateAll() {
+  updateIncomeTable();
+  updateExpenseTable();
+  updateSavingsTable();
+  updateChart();
+  document.getElementById("total-balance").textContent = `${translations[currentLang].balance}: €${getBalance().toFixed(2)}`;
+}
+
+// 🚀 Start
 document.addEventListener("DOMContentLoaded", () => {
-  // Thema instellen
   if (localStorage.getItem("theme") === "dark") {
     document.body.classList.add("dark-mode");
   }
 
-  // Koppelingen
   document.getElementById("income-btn").addEventListener("click", addIncome);
   document.getElementById("expense-btn").addEventListener("click", addExpense);
   document.getElementById("saving-btn").addEventListener("click", addSaving);
   document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
   document.getElementById("language-toggle").addEventListener("click", toggleLanguage);
   document.getElementById("export-btn").addEventListener("click", exportCSV);
-  document.getElementById("month-select").addEventListener("change", handleMonthChange);
+  document.getElementById("month-select").addEventListener("change", () => {
+    loadMonthData();
+    updateAll();
+  });
 
-  // Startwaarden laden
-  const currentMonth = document.getElementById("month-select").value;
-  loadMonthData(currentMonth);
+  loadMonthData();
   updateAll();
 });
 
