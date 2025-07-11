@@ -181,4 +181,4 @@ function updateSavingsTable() {
 }
 
 function getBalance() {
-  const inc = incomes.reduce((s, i) => s + i.amount, 0);
+  const inc = incomes.reduce((s, i) => s + i.amount, 0);}
