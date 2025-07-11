@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget & Sparen Overzicht</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Budget & Sparen Overzicht</h1>
+    <button id="toggle-theme">Thema wisselen</button>
+  </header>
+
+  <section>
+    <h2>Inkomsten</h2>
+    <table id="income-table">
+      <tr><th>Bron</th><th>Bedrag (€)</th></tr>
+      <tr><td>Salaris</td><td>3000</td></tr>
+      <tr><td>Freelance</td><td>500</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Uitgaven</h2>
+    <table id="expenses-table">
+      <tr><th>Categorie</th><th>Bedrag (€)</th></tr>
+      <tr><td>Huur</td><td>900</td></tr>
+      <tr><td>Boodschappen</td><td>300</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Spaardoelen</h2>
+    <table id="savings-table">
+      <tr><th>Doel</th><th>Doelbedrag (€)</th><th>Gespaard (€)</th></tr>
+      <tr><td>Vakantie</td><td>1000</td><td>400</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Overzicht</h2>
+    <p id="balance"></p>
+    <canvas id="budget-chart"></canvas>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
