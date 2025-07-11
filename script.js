@@ -133,8 +133,8 @@ function createDeleteButton(onClick) {
 }
 
 function updateIncomeTable() {
-  const table = document.getElementById("income-table");
-  table.innerHTML = "<tr><th>Bron</th><th>Bedrag (€)</th><th></th></tr>";
+  const table = document.getElementById("income-table").querySelector("tbody");
+  table.innerHTML = "";
   incomes.forEach((i, idx) => {
     const row = document.createElement("tr");
     const src = document.createElement("td"), amt = document.createElement("td");
@@ -148,8 +148,8 @@ function updateIncomeTable() {
 }
 
 function updateExpenseTable() {
-  const table = document.getElementById("expense-table");
-  table.innerHTML = "<tr><th>Categorie</th><th>Bedrag (€)</th><th></th></tr>";
+  const table = document.getElementById("expense-table").querySelector("tbody");
+  table.innerHTML = "";
   expenses.forEach((e, idx) => {
     const row = document.createElement("tr");
     const cat = document.createElement("td"), amt = document.createElement("td");
@@ -163,8 +163,8 @@ function updateExpenseTable() {
 }
 
 function updateSavingsTable() {
-  const table = document.getElementById("savings-table");
-  table.innerHTML = "<tr><th>Doel</th><th>Doelbedrag</th><th>Gespaard</th><th>Voortgang</th><th></th></tr>";
+  const table = document.getElementById("savings-table").querySelector("tbody");
+  table.innerHTML = "";
   savings.forEach((s, idx) => {
     const row = document.createElement("tr");
     const goal = document.createElement("td"), tgt = document.createElement("td"), prg = document.createElement("td"), bar = document.createElement("td");
@@ -181,4 +181,39 @@ function updateSavingsTable() {
 }
 
 function getBalance() {
-  const inc = incomes.reduce((s, i) => s + i.amount, 0);}
+  const inc = incomes.reduce((s, i) => s + i.amount, 0);
+  const exp = expenses.reduce((s, e) => s + e.amount, 0);
+  const sav = savings.reduce((s, s2) => s + s2.progress, 0);
+  return inc - exp + sav;
+}
+
+function updateChart() {
+  const ctx = document.getElementById("budget-chart").getContext("2d");
+  const data = [
+    incomes.reduce((sum, i) => sum + i.amount, 0),
+    expenses.reduce((sum, e) => sum + e.amount, 0),
+    savings.reduce((sum, s) => sum + s.progress, 0)
+  ];
+
+  if (!chart) {
+    chart = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["Inkomsten", "Uitgaven", "Gespaard"],
+        datasets: [{
+          data: data,
+          backgroundColor: ["#2a9d8f", "#e76f51", "#f4a261"]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "bottom" }
+        }
+      }
+    });
+  } else {
+    chart.data.datasets[0].data = data;
+    chart.update();
+  }
+}
