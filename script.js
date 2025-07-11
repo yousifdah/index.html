@@ -2,7 +2,6 @@ let incomes = [], expenses = [], savings = [];
 let currentLang = "nl";
 let chart;
 
-// 🌍 Taal vertaling
 const translations = {
   nl: {
     title: "Mijn Budgetplanner",
@@ -20,7 +19,6 @@ const translations = {
   }
 };
 
-// 📅 Dynamisch maanddropdown
 function generateMonthOptions(startYear = 2024, yearsAhead = 3) {
   const select = document.getElementById("month-select");
   const now = new Date();
@@ -31,8 +29,7 @@ function generateMonthOptions(startYear = 2024, yearsAhead = 3) {
     for (let m = 0; m < 12; m++) {
       const value = `${y}-${String(m + 1).padStart(2, "0")}`;
       const label = new Date(y, m).toLocaleString(currentLang === "nl" ? "nl-NL" : "en-US", {
-        month: "long",
-        year: "numeric"
+        month: "long", year: "numeric"
       });
       const option = document.createElement("option");
       option.value = value;
@@ -45,7 +42,6 @@ function generateMonthOptions(startYear = 2024, yearsAhead = 3) {
   select.value = defaultValue;
 }
 
-// 📆 Opslag
 function getMonthKey() {
   return "budget_" + document.getElementById("month-select").value;
 }
@@ -62,19 +58,15 @@ function loadMonthData() {
     expenses = data.expenses || [];
     savings = data.savings || [];
   } else {
-    incomes = [];
-    expenses = [];
-    savings = [];
+    incomes = []; expenses = []; savings = [];
   }
 }
 
-// 🌙 Thema wissel
 function toggleTheme() {
   document.body.classList.toggle("dark-mode");
   localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
 }
 
-// 🈶 Taal wissel
 function toggleLanguage() {
   currentLang = currentLang === "nl" ? "en" : "nl";
   const t = translations[currentLang];
@@ -88,7 +80,6 @@ function toggleLanguage() {
   document.getElementById("language-toggle").textContent = currentLang === "nl" ? "🇬🇧 Engels" : "🇳🇱 Nederlands";
 }
 
-// ✅ Toevoegen functies
 function addIncome() {
   const source = document.getElementById("income-source").value;
   const amount = parseFloat(document.getElementById("income-amount").value);
@@ -114,116 +105,88 @@ function addSaving() {
   saveMonthData(); updateAll();
 }
 
-// 🧠 Cellen bewerkbaar maken
 function makeEditable(cell, updateCallback) {
   cell.addEventListener("dblclick", () => {
-    const oldValue = cell.textContent;
+    const old = cell.textContent;
     const input = document.createElement("input");
-    input.value = oldValue;
+    input.value = old;
     cell.textContent = "";
     cell.appendChild(input);
     input.focus();
-
     input.addEventListener("blur", () => {
-      const newValue = input.value;
-      cell.textContent = newValue;
-      updateCallback(newValue);
+      const val = input.value;
+      cell.textContent = val;
+      updateCallback(val);
       saveMonthData(); updateAll();
     });
-
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") input.blur();
-    });
+    input.addEventListener("keydown", e => { if (e.key === "Enter") input.blur(); });
   });
 }
 
-// 📋 Tabellen
+function createDeleteButton(onClick) {
+  const td = document.createElement("td");
+  const btn = document.createElement("button");
+  btn.textContent = "❌";
+  btn.addEventListener("click", onClick);
+  td.appendChild(btn);
+  return td;
+}
+
 function updateIncomeTable() {
   const table = document.getElementById("income-table");
-  table.innerHTML = "<tr><th>Bron</th><th>Bedrag (€)</th></tr>";
+  table.innerHTML = "<tr><th>Bron</th><th>Bedrag (€)</th><th></th></tr>";
   incomes.forEach((i, idx) => {
     const row = document.createElement("tr");
-    const sourceCell = document.createElement("td");
-    const amountCell = document.createElement("td");
-
-    sourceCell.textContent = i.source;
-    amountCell.textContent = i.amount.toFixed(2);
-
-    makeEditable(sourceCell, val => incomes[idx].source = val);
-    makeEditable(amountCell, val => incomes[idx].amount = parseFloat(val) || 0);
-
-    row.appendChild(sourceCell); row.appendChild(amountCell);
+    const src = document.createElement("td"), amt = document.createElement("td");
+    src.textContent = i.source; amt.textContent = i.amount.toFixed(2);
+    makeEditable(src, val => incomes[idx].source = val);
+    makeEditable(amt, val => incomes[idx].amount = parseFloat(val) || 0);
+    row.appendChild(src); row.appendChild(amt);
+    row.appendChild(createDeleteButton(() => { incomes.splice(idx, 1); saveMonthData(); updateAll(); }));
     table.appendChild(row);
   });
 }
 
 function updateExpenseTable() {
   const table = document.getElementById("expense-table");
-  table.innerHTML = "<tr><th>Categorie</th><th>Bedrag (€)</th></tr>";
+  table.innerHTML = "<tr><th>Categorie</th><th>Bedrag (€)</th><th></th></tr>";
   expenses.forEach((e, idx) => {
     const row = document.createElement("tr");
-    const catCell = document.createElement("td");
-    const amtCell = document.createElement("td");
-
-    catCell.textContent = e.category;
-    amtCell.textContent = e.amount.toFixed(2);
-
-    makeEditable(catCell, val => expenses[idx].category = val);
-    makeEditable(amtCell, val => expenses[idx].amount = parseFloat(val) || 0);
-
-    row.appendChild(catCell); row.appendChild(amtCell);
+    const cat = document.createElement("td"), amt = document.createElement("td");
+    cat.textContent = e.category; amt.textContent = e.amount.toFixed(2);
+    makeEditable(cat, val => expenses[idx].category = val);
+    makeEditable(amt, val => expenses[idx].amount = parseFloat(val) || 0);
+    row.appendChild(cat); row.appendChild(amt);
+    row.appendChild(createDeleteButton(() => { expenses.splice(idx, 1); saveMonthData(); updateAll(); }));
     table.appendChild(row);
   });
 }
 
 function updateSavingsTable() {
   const table = document.getElementById("savings-table");
-  table.innerHTML = "<tr><th>Doel</th><th>Doelbedrag</th><th>Gespaard</th><th>Voortgang</th></tr>";
+  table.innerHTML = "<tr><th>Doel</th><th>Doelbedrag</th><th>Gespaard</th><th>Voortgang</th><th></th></tr>";
   savings.forEach((s, idx) => {
     const row = document.createElement("tr");
-    const goalCell = document.createElement("td");
-    const targetCell = document.createElement("td");
-    const progressCell = document.createElement("td");
-    const barCell = document.createElement("td");
-
-    goalCell.textContent = s.goal;
-    targetCell.textContent = s.target.toFixed(2);
-    progressCell.textContent = s.progress.toFixed(2);
-
-    makeEditable(goalCell, val => savings[idx].goal = val);
-    makeEditable(targetCell, val => savings[idx].target = parseFloat(val) || 0);
-    makeEditable(progressCell, val => savings[idx].progress = parseFloat(val) || 0);
-
+    const goal = document.createElement("td"), tgt = document.createElement("td"), prg = document.createElement("td"), bar = document.createElement("td");
+    goal.textContent = s.goal; tgt.textContent = s.target.toFixed(2); prg.textContent = s.progress.toFixed(2);
+    makeEditable(goal, val => savings[idx].goal = val);
+    makeEditable(tgt, val => savings[idx].target = parseFloat(val) || 0);
+    makeEditable(prg, val => savings[idx].progress = parseFloat(val) || 0);
     const percent = Math.min((s.progress / s.target) * 100, 100);
-    barCell.innerHTML = `<progress value="${percent}" max="100"></progress>`;
-
-    row.appendChild(goalCell);
-    row.appendChild(targetCell);
-    row.appendChild(progressCell);
-    row.appendChild(barCell);
+    bar.innerHTML = `<progress value="${percent}" max="100"></progress>`;
+    row.appendChild(goal); row.appendChild(tgt); row.appendChild(prg); row.appendChild(bar);
+    row.appendChild(createDeleteButton(() => { savings.splice(idx, 1); saveMonthData(); updateAll(); }));
     table.appendChild(row);
   });
 }
 
-// 📊 Grafiek
+function getBalance() {
+  const inc = incomes.reduce((s, i) => s + i.amount, 0);
+  const exp = expenses.reduce((s, e) => s + e.amount, 0);
+  const sav = savings.reduce((s, s2) => s + s2.progress, 0);
+  return inc - exp + sav;
+}
+
 function updateChart() {
   const ctx = document.getElementById("budget-chart").getContext("2d");
-  const data = [
-    incomes.reduce((sum, i) => sum + i.amount, 0),
-    expenses.reduce((sum, e) => sum + e.amount, 0),
-    savings.reduce((sum, s) => sum + s.progress, 0)
-  ];
-
-  if (!chart) {
-    chart = new Chart(ctx, {
-      type: "doughnut",
-      data: {
-        labels: ["Inkomsten", "Uitgaven", "Gespaard"],
-        datasets: [{
-          data,
-          backgroundColor: ["#2a9d8f", "#e76f51", "#f4a261"]
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { position
+  const data = [incomes.reduce((s
