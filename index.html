@@ -1,46 +1,67 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Budget & Sparen Overzicht</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mijn Budgetplanner</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
   <header>
-    <h1>Budget & Sparen Overzicht</h1>
-    <button id="toggle-theme">Thema wisselen</button>
+    <h1 id="page-title">Mijn Budgetplanner</h1>
+    <div class="controls">
+      <button id="theme-toggle">🌙 Thema</button>
+      <button id="language-toggle">🇬🇧 Engels</button>
+    </div>
   </header>
+
+  <section class="form-section">
+    <h2>Inkomsten toevoegen</h2>
+    <input type="text" id="income-source" placeholder="Bron">
+    <input type="number" id="income-amount" placeholder="Bedrag (€)">
+    <button onclick="addIncome()">Toevoegen</button>
+  </section>
+
+  <section class="form-section">
+    <h2>Uitgaven toevoegen</h2>
+    <input type="text" id="expense-category" placeholder="Categorie">
+    <input type="number" id="expense-amount" placeholder="Bedrag (€)">
+    <button onclick="addExpense()">Toevoegen</button>
+  </section>
+
+  <section class="form-section">
+    <h2>Spaardoel toevoegen</h2>
+    <input type="text" id="saving-goal" placeholder="Doel">
+    <input type="number" id="saving-target" placeholder="Doelbedrag (€)">
+    <input type="number" id="saving-progress" placeholder="Gespaard (€)">
+    <button onclick="addSaving()">Toevoegen</button>
+  </section>
 
   <section>
     <h2>Inkomsten</h2>
     <table id="income-table">
       <tr><th>Bron</th><th>Bedrag (€)</th></tr>
-      <tr><td>Salaris</td><td>3000</td></tr>
-      <tr><td>Freelance</td><td>500</td></tr>
     </table>
   </section>
 
   <section>
     <h2>Uitgaven</h2>
-    <table id="expenses-table">
+    <table id="expense-table">
       <tr><th>Categorie</th><th>Bedrag (€)</th></tr>
-      <tr><td>Huur</td><td>900</td></tr>
-      <tr><td>Boodschappen</td><td>300</td></tr>
     </table>
   </section>
 
   <section>
     <h2>Spaardoelen</h2>
     <table id="savings-table">
-      <tr><th>Doel</th><th>Doelbedrag (€)</th><th>Gespaard (€)</th></tr>
-      <tr><td>Vakantie</td><td>1000</td><td>400</td></tr>
+      <tr><th>Doel</th><th>Doelbedrag</th><th>Gespaard</th><th>Voortgang</th></tr>
     </table>
   </section>
 
   <section>
     <h2>Overzicht</h2>
-    <p id="balance"></p>
+    <p id="total-balance">Totaal saldo: €0</p>
     <canvas id="budget-chart"></canvas>
   </section>
 
