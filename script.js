@@ -187,5 +187,3 @@ function getBalance() {
   return inc - exp + sav;
 }
 
-function updateChart() {
-  const ctx = document.getElementById("budget-chart").getContext("2d");
