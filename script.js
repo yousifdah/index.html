@@ -125,12 +125,14 @@ function makeEditable(cell, updateCallback) {
 
 function createDeleteButton(onClick) {
   const td = document.createElement("td");
-  const btn = document.createElement("button");
-  btn.textContent = "❌";
-  btn.addEventListener("click", onClick);
-  td.appendChild(btn);
+  const span = document.createElement("span");
+  span.textContent = "✕";
+  span.classList.add("delete-icon");
+  span.addEventListener("click", onClick);
+  td.appendChild(span);
   return td;
 }
+
 
 function updateIncomeTable() {
   const table = document.getElementById("income-table").querySelector("tbody");
@@ -186,15 +188,7 @@ function getBalance() {
   const sav = savings.reduce((s, s2) => s + s2.progress, 0);
   return inc - exp + sav;
 }
-function createDeleteButton(onClick) {
-  const td = document.createElement("td");
-  const btn = document.createElement("button");
-  btn.textContent = "✕";
-  btn.classList.add("delete-btn");
-  btn.addEventListener("click", onClick);
-  td.appendChild(btn);
-  return td;
-}
+
 
 function updateChart() {
   const ctx = document.getElementById("budget-chart").getContext("2d");
