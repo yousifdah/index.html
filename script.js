@@ -2,13 +2,7 @@ let incomes = [], expenses = [], savings = [];
 let currentLang = "nl";
 let chart;
 
-// 🌙 Thema wissel
-function toggleTheme() {
-  document.body.classList.toggle("dark-mode");
-  localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
-}
-
-// 🌍 Taal wissel
+// 🌍 Taal vertaling
 const translations = {
   nl: {
     title: "Mijn Budgetplanner",
@@ -26,27 +20,38 @@ const translations = {
   }
 };
 
-function toggleLanguage() {
-  currentLang = currentLang === "nl" ? "en" : "nl";
-  const t = translations[currentLang];
-  document.getElementById("page-title").textContent = t.title;
-  document.querySelectorAll("section").forEach((sec, i) => {
-    if (i === 1) sec.querySelector("h2").textContent = t.income;
-    if (i === 2) sec.querySelector("h2").textContent = t.expenses;
-    if (i === 3) sec.querySelector("h2").textContent = t.savings;
-    if (i === 7) sec.querySelector("p").textContent = `${t.balance}: €${getBalance()}`;
-  });
-  document.getElementById("language-toggle").textContent = currentLang === "nl" ? "🇬🇧 Engels" : "🇳🇱 Nederlands";
+// 📅 Dynamisch maanddropdown
+function generateMonthOptions(startYear = 2024, yearsAhead = 3) {
+  const select = document.getElementById("month-select");
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  for (let y = startYear; y <= startYear + yearsAhead; y++) {
+    for (let m = 0; m < 12; m++) {
+      const value = `${y}-${String(m + 1).padStart(2, "0")}`;
+      const label = new Date(y, m).toLocaleString(currentLang === "nl" ? "nl-NL" : "en-US", {
+        month: "long",
+        year: "numeric"
+      });
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+      select.appendChild(option);
+    }
+  }
+
+  const defaultValue = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
+  select.value = defaultValue;
 }
 
-// 📆 Maandbeheer
+// 📆 Opslag
 function getMonthKey() {
   return "budget_" + document.getElementById("month-select").value;
 }
 
 function saveMonthData() {
-  const data = { incomes, expenses, savings };
-  localStorage.setItem(getMonthKey(), JSON.stringify(data));
+  localStorage.setItem(getMonthKey(), JSON.stringify({ incomes, expenses, savings }));
 }
 
 function loadMonthData() {
@@ -63,14 +68,33 @@ function loadMonthData() {
   }
 }
 
-// ➕ Toevoegen functies
+// 🌙 Thema wissel
+function toggleTheme() {
+  document.body.classList.toggle("dark-mode");
+  localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+}
+
+// 🈶 Taal wissel
+function toggleLanguage() {
+  currentLang = currentLang === "nl" ? "en" : "nl";
+  const t = translations[currentLang];
+  document.getElementById("page-title").textContent = t.title;
+  document.querySelectorAll("section").forEach((sec, i) => {
+    if (i === 1) sec.querySelector("h2").textContent = t.income;
+    if (i === 2) sec.querySelector("h2").textContent = t.expenses;
+    if (i === 3) sec.querySelector("h2").textContent = t.savings;
+    if (i === 7) sec.querySelector("p").textContent = `${t.balance}: €${getBalance().toFixed(2)}`;
+  });
+  document.getElementById("language-toggle").textContent = currentLang === "nl" ? "🇬🇧 Engels" : "🇳🇱 Nederlands";
+}
+
+// ✅ Toevoegen functies
 function addIncome() {
   const source = document.getElementById("income-source").value;
   const amount = parseFloat(document.getElementById("income-amount").value);
   if (!source || isNaN(amount)) return alert("Vul een geldige bron en bedrag in.");
   incomes.push({ source, amount });
-  saveMonthData();
-  updateAll();
+  saveMonthData(); updateAll();
 }
 
 function addExpense() {
@@ -78,8 +102,7 @@ function addExpense() {
   const amount = parseFloat(document.getElementById("expense-amount").value);
   if (!category || isNaN(amount)) return alert("Vul een geldige categorie en bedrag in.");
   expenses.push({ category, amount });
-  saveMonthData();
-  updateAll();
+  saveMonthData(); updateAll();
 }
 
 function addSaving() {
@@ -88,47 +111,98 @@ function addSaving() {
   const progress = parseFloat(document.getElementById("saving-progress").value);
   if (!goal || isNaN(target) || isNaN(progress)) return alert("Vul alle spaarvelden correct in.");
   savings.push({ goal, target, progress });
-  saveMonthData();
-  updateAll();
+  saveMonthData(); updateAll();
+}
+
+// 🧠 Cellen bewerkbaar maken
+function makeEditable(cell, updateCallback) {
+  cell.addEventListener("dblclick", () => {
+    const oldValue = cell.textContent;
+    const input = document.createElement("input");
+    input.value = oldValue;
+    cell.textContent = "";
+    cell.appendChild(input);
+    input.focus();
+
+    input.addEventListener("blur", () => {
+      const newValue = input.value;
+      cell.textContent = newValue;
+      updateCallback(newValue);
+      saveMonthData(); updateAll();
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") input.blur();
+    });
+  });
 }
 
 // 📋 Tabellen
 function updateIncomeTable() {
   const table = document.getElementById("income-table");
   table.innerHTML = "<tr><th>Bron</th><th>Bedrag (€)</th></tr>";
-  incomes.forEach(i => {
-    table.innerHTML += `<tr><td>${i.source}</td><td>${i.amount.toFixed(2)}</td></tr>`;
+  incomes.forEach((i, idx) => {
+    const row = document.createElement("tr");
+    const sourceCell = document.createElement("td");
+    const amountCell = document.createElement("td");
+
+    sourceCell.textContent = i.source;
+    amountCell.textContent = i.amount.toFixed(2);
+
+    makeEditable(sourceCell, val => incomes[idx].source = val);
+    makeEditable(amountCell, val => incomes[idx].amount = parseFloat(val) || 0);
+
+    row.appendChild(sourceCell); row.appendChild(amountCell);
+    table.appendChild(row);
   });
 }
 
 function updateExpenseTable() {
   const table = document.getElementById("expense-table");
   table.innerHTML = "<tr><th>Categorie</th><th>Bedrag (€)</th></tr>";
-  expenses.forEach(e => {
-    table.innerHTML += `<tr><td>${e.category}</td><td>${e.amount.toFixed(2)}</td></tr>`;
+  expenses.forEach((e, idx) => {
+    const row = document.createElement("tr");
+    const catCell = document.createElement("td");
+    const amtCell = document.createElement("td");
+
+    catCell.textContent = e.category;
+    amtCell.textContent = e.amount.toFixed(2);
+
+    makeEditable(catCell, val => expenses[idx].category = val);
+    makeEditable(amtCell, val => expenses[idx].amount = parseFloat(val) || 0);
+
+    row.appendChild(catCell); row.appendChild(amtCell);
+    table.appendChild(row);
   });
 }
 
 function updateSavingsTable() {
   const table = document.getElementById("savings-table");
   table.innerHTML = "<tr><th>Doel</th><th>Doelbedrag</th><th>Gespaard</th><th>Voortgang</th></tr>";
-  savings.forEach(s => {
-    const percent = Math.min((s.progress / s.target) * 100, 100);
-    table.innerHTML += `<tr>
-      <td>${s.goal}</td>
-      <td>€${s.target.toFixed(2)}</td>
-      <td>€${s.progress.toFixed(2)}</td>
-      <td><progress value="${percent}" max="100"></progress></td>
-    </tr>`;
-  });
-}
+  savings.forEach((s, idx) => {
+    const row = document.createElement("tr");
+    const goalCell = document.createElement("td");
+    const targetCell = document.createElement("td");
+    const progressCell = document.createElement("td");
+    const barCell = document.createElement("td");
 
-// 💰 Saldo
-function getBalance() {
-  const incomeTotal = incomes.reduce((sum, i) => sum + i.amount, 0);
-  const expenseTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const savingsTotal = savings.reduce((sum, s) => sum + s.progress, 0);
-  return incomeTotal - expenseTotal + savingsTotal;
+    goalCell.textContent = s.goal;
+    targetCell.textContent = s.target.toFixed(2);
+    progressCell.textContent = s.progress.toFixed(2);
+
+    makeEditable(goalCell, val => savings[idx].goal = val);
+    makeEditable(targetCell, val => savings[idx].target = parseFloat(val) || 0);
+    makeEditable(progressCell, val => savings[idx].progress = parseFloat(val) || 0);
+
+    const percent = Math.min((s.progress / s.target) * 100, 100);
+    barCell.innerHTML = `<progress value="${percent}" max="100"></progress>`;
+
+    row.appendChild(goalCell);
+    row.appendChild(targetCell);
+    row.appendChild(progressCell);
+    row.appendChild(barCell);
+    table.appendChild(row);
+  });
 }
 
 // 📊 Grafiek
@@ -152,58 +226,4 @@ function updateChart() {
       },
       options: {
         responsive: true,
-        plugins: {
-          legend: { position: "bottom" }
-        }
-      }
-    });
-  } else {
-    chart.data.datasets[0].data = data;
-    chart.update();
-  }
-}
-
-// 📥 CSV-export
-function exportCSV() {
-  let csv = "Type,Beschrijving,Bedrag\n";
-  incomes.forEach(i => csv += `Inkomen,${i.source},${i.amount}\n`);
-  expenses.forEach(e => csv += `Uitgave,${e.category},${e.amount}\n`);
-  savings.forEach(s => csv += `Spaardoel,${s.goal},${s.progress}/${s.target}\n`);
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `budget_${document.getElementById("month-select").value}.csv`;
-  link.click();
-}
-
-// 🔄 Alles updaten
-function updateAll() {
-  updateIncomeTable();
-  updateExpenseTable();
-  updateSavingsTable();
-  updateChart();
-  document.getElementById("total-balance").textContent = `${translations[currentLang].balance}: €${getBalance().toFixed(2)}`;
-}
-
-// 🚀 Start
-document.addEventListener("DOMContentLoaded", () => {
-  if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("dark-mode");
-  }
-
-  document.getElementById("income-btn").addEventListener("click", addIncome);
-  document.getElementById("expense-btn").addEventListener("click", addExpense);
-  document.getElementById("saving-btn").addEventListener("click", addSaving);
-  document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
-  document.getElementById("language-toggle").addEventListener("click", toggleLanguage);
-  document.getElementById("export-btn").addEventListener("click", exportCSV);
-  document.getElementById("month-select").addEventListener("change", () => {
-    loadMonthData();
-    updateAll();
-  });
-
-  loadMonthData();
-  updateAll();
-});
-
+        plugins: { legend: { position
