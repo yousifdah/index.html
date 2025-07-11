@@ -71,12 +71,17 @@ function toggleLanguage() {
   currentLang = currentLang === "nl" ? "en" : "nl";
   const t = translations[currentLang];
   document.getElementById("page-title").textContent = t.title;
-  document.querySelectorAll("section").forEach((sec, i) => {
-    if (i === 1) sec.querySelector("h2").textContent = t.income;
-    if (i === 2) sec.querySelector("h2").textContent = t.expenses;
-    if (i === 3) sec.querySelector("h2").textContent = t.savings;
-    if (i === 7) sec.querySelector("p").textContent = `${t.balance}: €${getBalance().toFixed(2)}`;
-  });
+
+  const sections = document.querySelectorAll("section");
+  sections[1].querySelector("h2").textContent = t.income;
+  sections[2].querySelector("h2").textContent = t.expenses;
+  sections[3].querySelector("h2").textContent = t.savings;
+  sections[7].querySelector("p").textContent = `${t.balance}: €${getBalance().toFixed(2)}`;
+
+  document.getElementById("income-btn").textContent = currentLang === "nl" ? "Toevoegen" : "Add";
+  document.getElementById("expense-btn").textContent = currentLang === "nl" ? "Toevoegen" : "Add";
+  document.getElementById("saving-btn").textContent = currentLang === "nl" ? "Toevoegen" : "Add";
+  document.getElementById("export-btn").textContent = currentLang === "nl" ? "Download als CSV" : "Download CSV";
   document.getElementById("language-toggle").textContent = currentLang === "nl" ? "🇬🇧 Engels" : "🇳🇱 Nederlands";
 }
 
@@ -85,6 +90,8 @@ function addIncome() {
   const amount = parseFloat(document.getElementById("income-amount").value);
   if (!source || isNaN(amount)) return alert("Vul een geldige bron en bedrag in.");
   incomes.push({ source, amount });
+  document.getElementById("income-source").value = "";
+  document.getElementById("income-amount").value = "";
   saveMonthData(); updateAll();
 }
 
@@ -93,6 +100,8 @@ function addExpense() {
   const amount = parseFloat(document.getElementById("expense-amount").value);
   if (!category || isNaN(amount)) return alert("Vul een geldige categorie en bedrag in.");
   expenses.push({ category, amount });
+  document.getElementById("expense-category").value = "";
+  document.getElementById("expense-amount").value = "";
   saveMonthData(); updateAll();
 }
 
@@ -102,6 +111,9 @@ function addSaving() {
   const progress = parseFloat(document.getElementById("saving-progress").value);
   if (!goal || isNaN(target) || isNaN(progress)) return alert("Vul alle spaarvelden correct in.");
   savings.push({ goal, target, progress });
+  document.getElementById("saving-goal").value = "";
+  document.getElementById("saving-target").value = "";
+  document.getElementById("saving-progress").value = "";
   saveMonthData(); updateAll();
 }
 
@@ -132,7 +144,6 @@ function createDeleteButton(onClick) {
   td.appendChild(span);
   return td;
 }
-
 
 function updateIncomeTable() {
   const table = document.getElementById("income-table").querySelector("tbody");
@@ -169,55 +180,33 @@ function updateSavingsTable() {
   table.innerHTML = "";
   savings.forEach((s, idx) => {
     const row = document.createElement("tr");
-    const goal = document.createElement("td"), tgt = document.createElement("td"), prg = document.createElement("td"), bar = document.createElement("td");
-    goal.textContent = s.goal; tgt.textContent = s.target.toFixed(2); prg.textContent = s.progress.toFixed(2);
+
+    const goal = document.createElement("td");
+    const tgt = document.createElement("td");
+    const prg = document.createElement("td");
+    const bar = document.createElement("td");
+
+    goal.textContent = s.goal;
+    tgt.textContent = s.target.toFixed(2);
+    prg.textContent = s.progress.toFixed(2);
+
     makeEditable(goal, val => savings[idx].goal = val);
     makeEditable(tgt, val => savings[idx].target = parseFloat(val) || 0);
     makeEditable(prg, val => savings[idx].progress = parseFloat(val) || 0);
+
     const percent = Math.min((s.progress / s.target) * 100, 100);
     bar.innerHTML = `<progress value="${percent}" max="100"></progress>`;
-    row.appendChild(goal); row.appendChild(tgt); row.appendChild(prg); row.appendChild(bar);
-    row.appendChild(createDeleteButton(() => { savings.splice(idx, 1); saveMonthData(); updateAll(); }));
+
+    row.appendChild(goal);
+    row.appendChild(tgt);
+    row.appendChild(prg);
+    row.appendChild(bar);
+    row.appendChild(createDeleteButton(() => {
+      savings.splice(idx, 1);
+      saveMonthData();
+      updateAll();
+    }));
+
     table.appendChild(row);
   });
-}
-
-function getBalance() {
-  const inc = incomes.reduce((s, i) => s + i.amount, 0);
-  const exp = expenses.reduce((s, e) => s + e.amount, 0);
-  const sav = savings.reduce((s, s2) => s + s2.progress, 0);
-  return inc - exp + sav;
-}
-
-
-function updateChart() {
-  const ctx = document.getElementById("budget-chart").getContext("2d");
-  const data = [
-    incomes.reduce((sum, i) => sum + i.amount, 0),
-    expenses.reduce((sum, e) => sum + e.amount, 0),
-    savings.reduce((sum, s) => sum + s.progress, 0)
-  ];
-
-if (!chart) {
-  chart = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: ["Inkomsten", "Uitgaven", "Gespaard"],
-      datasets: [{
-        data: data,
-        backgroundColor: ["#2a9d8f", "#e76f51", "#f4a261"]
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "bottom"
-        }
-      }
-    }
-  });
-} else {
-  chart.data.datasets[0].data = data;
-  chart.update();
 }
