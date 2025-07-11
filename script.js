@@ -1,3 +1,13 @@
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("income-btn").addEventListener("click", addIncome);
+  document.getElementById("expense-btn").addEventListener("click", addExpense);
+  document.getElementById("saving-btn").addEventListener("click", addSaving);
+  document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+  document.getElementById("language-toggle").addEventListener("click", toggleLanguage);
+  document.getElementById("export-btn").addEventListener("click", exportCSV);
+  document.getElementById("month-select").addEventListener("change", handleMonthChange);
+});
+
 // 🌙 Thema wisselaar
 document.getElementById("theme-toggle").addEventListener("click", () => {
   document.body.classList.toggle("dark-mode");
