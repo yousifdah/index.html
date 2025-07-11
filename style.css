@@ -61,3 +61,15 @@ input {
 .dark-mode table, .dark-mode th, .dark-mode td {
   border-color: #555;
 }
+.delete-btn {
+  font-size: 16px;
+  padding: 2px 6px;
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  color: red;
+}
